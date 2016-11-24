@@ -87,3 +87,8 @@ ENV/
 
 # Rope project settings
 .ropeproject
+
+# Unimportant files
+.idea/
+code/Long.pyc
+code/Short.pyc
