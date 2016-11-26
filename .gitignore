@@ -89,6 +89,6 @@ ENV/
 .ropeproject
 
 # Unimportant files
-.idea/
+#.idea/
 code/Long.pyc
 code/Short.pyc
