@@ -120,9 +120,27 @@ def multiple():
     print("Goodbye...")
     quit()
 
+def loadlibrary():
+    prompt = input("Do you already have a library: Y/n ")
+    if checkoption(prompt):
+        path = input("Please enter the path to file:")
+        prompt = input("Would you like to add more files to the library: Y/n ")
+        if checkoption(prompt):
+            start()
+        else:
+            print("Loading library...")
+    else:
+        prompt = input("Would you like to create a new library: Y/n ")
+        if checkoption(prompt):
+            start()
+        else:
+            print("Goodbye...")
+            quit()
+
 # start of application
 def start():
     single()
     multiple()
 
+loadlibrary()
 start()
