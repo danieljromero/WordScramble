@@ -106,6 +106,7 @@ code/__init__.py
 
 # tests
 tests/
+tests
 
 #pyc
 .pyc
