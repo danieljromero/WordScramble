@@ -88,8 +88,24 @@ ENV/
 # Rope project settings
 .ropeproject
 
-# Unimportant files
+# intellij
 .idea
 .idea/
-code/Long.pyc
-code/Short.pyc
+.idea/misc.xml
+.idea/modules.xml
+.idea/vcs.xml
+.idea/workspace.xml
+.idea/scramble-py.iml
+
+# refactoring
+code/combinations.py
+code/long.py
+code/scramble.py
+code/short.py
+code/__init__.py
+
+# tests
+tests/
+
+#pyc
+.pyc
