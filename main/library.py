@@ -1,8 +1,11 @@
 # File: library.py
 import glob
+import json
 from pathlib import Path
+
 # our library
 library = dict()
+
 
 # returns boolean from user input
 def checkoption(option):
@@ -10,6 +13,7 @@ def checkoption(option):
         return True
     else:
         return False
+
 
 # returns boolean if path is a directory
 def checkdir(path):
@@ -19,10 +23,12 @@ def checkdir(path):
     else:
         return False
 
+
 # locates file(s) and returns a list
 def locateall(path):
     found = glob.glob(path)
     return found
+
 
 # calls start() after successfully adding a dictionary
 def startover():
@@ -30,10 +36,17 @@ def startover():
     if checkoption(prompt):
         start()
 
+
 # prompt
 def dictpath():
     path = input("Enter path: ")
     return path
+
+
+def printlibrary(lib):
+    for k, v in lib.items():
+        print("Key: ["+ k +"] " + "Path: [" + v + "]")
+
 
 # gets user input and returns the correct path value
 def authenticate(message, method):
@@ -50,7 +63,8 @@ def authenticate(message, method):
         print("Cannot not locate " + message + ", please try again")
         method()
 
-# adds dictionaries to the library
+
+# adds dictionaries to the path library
 def addtolibrary(list):
     for val in list:
         check = False
@@ -64,83 +78,109 @@ def addtolibrary(list):
                 check = True
             else:
                 check = False
-    print("Added to library")
+    print("Added!")
     startover()
 
+
 # adds single dictionary
-def loadbyfile():
-        value = authenticate("file", loadbyfile)
-        found = locateall(value)
-        addtolibrary(found)
+def usebyfile():
+    value = authenticate("file", usebyfile)
+    found = locateall(value)
+    addtolibrary(found)
+
 
 # adds entire directory of dictionaries
-def loadbydirectory():
-        value = authenticate("directory", loadbydirectory)
-        if value.endswith("/"):
-            newpath = value + "*"
-            found = locateall(newpath)
-            addtolibrary(found)
-        else:
-            newpath = value + "/*"
-            found = locateall(newpath)
-            addtolibrary(found)
-
-# adds dictionaries by extension
-def loadbyextension():
-        value = authenticate("extension", loadbyextension)
-        extension = input("Enter file extension to use: ")
-        newpath = value + "/*" + extension
+def usebydirectory():
+    value = authenticate("directory", usebydirectory)
+    if value.endswith("/"):
+        newpath = value + "*"
+        found = locateall(newpath)
+        addtolibrary(found)
+    else:
+        newpath = value + "/*"
         found = locateall(newpath)
         addtolibrary(found)
 
+
+# adds dictionaries by extension
+def usebyextension():
+    value = authenticate("extension", usebyextension)
+    extension = input("Enter file extension to use: ")
+    newpath = value + "/*" + extension
+    found = locateall(newpath)
+    addtolibrary(found)
+
+
 # single dictionary option
 def single():
-    option = input("Would you like to use a single dictionary: Y/n ")
+    option = input("Add a single dictionary to new path library: Y/n ")
     if checkoption(option):
-        loadbyfile()
+        usebyfile()
+
 
 # multiple dictionaries option
 def multiple():
-    option = input("Load all dictionaries within a directory: Y/n ")
+    option = input("Add entire directory of dictionaries to new path library: Y/n ")
     if checkoption(option):
-        loadbydirectory()
+        usebydirectory()
 
-    option = input("Load specific files within a directory by extension instead: Y/n ")
+    option = input("Add dictionaries by extension to new path library: Y/n ")
     if checkoption(option):
-        loadbyextension()
+        usebyextension()
 
     if library:
-        print("Current library size: " + str(len(library)))
-        prompt = input("Would you like to see the value(s) in the library? Y/n ")
+        print("Current path library size: " + str(len(library)))
+        prompt = input("Would you like to see the value(s) in the path library? Y/n ")
         if checkoption(prompt):
-            print(library)
+            printlibrary(library)
     else:
-        print("Current library: empty!")
+        print("Current path library: empty!")
 
     print("Goodbye...")
     quit()
 
-def loadlibrary():
-    prompt = input("Do you already have a library: Y/n ")
-    if checkoption(prompt):
-        path = input("Please enter the path to file:")
-        prompt = input("Would you like to add more files to the library: Y/n ")
-        if checkoption(prompt):
-            start()
-        else:
-            print("Loading library...")
+
+# using JSON file as path library
+def usepathlibrary():
+    jsonfile = Path(dictpath())
+    if jsonfile.is_file():
+        location = str(jsonfile.resolve())
+        try:
+            mypathlib = json.load(open(location))
+            print("Success! Using: " + str(jsonfile))
+            return mypathlib
+        except ValueError:
+            print("This is not a JSON file, please try again")
+            usepathlibrary()
     else:
-        prompt = input("Would you like to create a new library: Y/n ")
+        print("Cannot not locate JSON file, please try again")
+        usepathlibrary()
+
+def selectpathlibrary():
+    prompt = input("Do you already have a path library: Y/n ")
+    if checkoption(prompt):
+        prompt = input("Are you using a SQLite Database: Y/n ")
+        if checkoption(prompt):
+            print("make connection...") # Coming soon SQLite connection ...
+        else:
+            print("Looking for JSON file...")
+            json_dict = usepathlibrary()
+            print(json_dict)
+            library.update(json_dict)
+    else:
+        prompt = input("Would you like to create a new path library: Y/n ")
         if checkoption(prompt):
             start()
         else:
             print("Goodbye...")
             quit()
 
+
 # start of application
 def start():
     single()
     multiple()
 
-loadlibrary()
+
+selectpathlibrary()
 start()

@@ -98,11 +98,12 @@ ENV/
 .idea/scramble-py.iml
 
 # refactoring
-code/combinations.py
-code/long.py
-code/scramble.py
-code/short.py
-code/__init__.py
+main/combinations.py
+main/long.py
+main/scramble.py
+main/short.py
+main/__init__.py
+code/
 
 # tests
 tests/
