@@ -3,8 +3,8 @@ import glob
 import json
 from pathlib import Path
 
-# our library
-library = dict()
+# our path library
+pathlibrary = dict()
 
 
 # returns boolean from user input
@@ -30,11 +30,14 @@ def locateall(path):
     return found
 
 
-# calls start() after successfully adding a dictionary
+# calls start() after successfully adding a path to path library
 def startover():
-    prompt = input("Would you like to add more dictionaries: Y/n ")
+    prompt = input("Would you like to add more paths to library: Y/n ")
     if checkoption(prompt):
         start()
+    else:
+        print("continuing...")
+        openallpaths(pathlibrary)
 
 
 # prompt
@@ -69,12 +72,12 @@ def addtolibrary(list):
     for val in list:
         check = False
         while not check:
-            print("For this dictionary: " + val)
+            print("For this path: " + val)
             key = input("Please enter a unique key to identify it: ")
-            print("Key:", key, ", Dictionary:", val)
+            print("Key:", key, ", Path:", val)
             prompt = input("Is this information correct: Y/n ")
             if checkoption(prompt):
-                library.update({key: val})
+                pathlibrary.update({key: val})
                 check = True
             else:
                 check = False
@@ -82,14 +85,14 @@ def addtolibrary(list):
     startover()
 
 
-# adds single dictionary
+# adds path to a single dictionary to path library
 def usebyfile():
     value = authenticate("file", usebyfile)
     found = locateall(value)
     addtolibrary(found)
 
 
-# adds entire directory of dictionaries
+# adds path to an entire directory of dictionaries to path library
 def usebydirectory():
     value = authenticate("directory", usebydirectory)
     if value.endswith("/"):
@@ -102,7 +105,7 @@ def usebydirectory():
         addtolibrary(found)
 
 
-# adds dictionaries by extension
+# adds paths of dictionaries by extension to path library
 def usebyextension():
     value = authenticate("extension", usebyextension)
     extension = input("Enter file extension to use: ")
@@ -128,16 +131,37 @@ def multiple():
     if checkoption(option):
         usebyextension()
 
-    if library:
-        print("Current path library size: " + str(len(library)))
+    if pathlibrary:
+        print("Current path library size: " + str(len(pathlibrary)))
         prompt = input("Would you like to see the value(s) in the path library? Y/n ")
         if checkoption(prompt):
-            printlibrary(library)
+            printlibrary(pathlibrary)
+        prompt = input("Would you like to store the path library as JSON file: Y/n ")
+        if checkoption(prompt):
+            createJSON(pathlibrary)
+        else:
+            prompt = input("Your current path library will NOT be saved, is that okay: Y/n ")
+            if checkoption(prompt):
+                openallpaths(pathlibrary)
+            else:
+                createJSON(pathlibrary)
     else:
         print("Current path library: empty!")
 
     print("Goodbye...")
     quit()
+
+
+# creates JSON file from path library data
+def createJSON(lib_data):
+    if lib_data:
+        title = input("Enter title for the new JSON file: ")
+        with open(title+'.json', 'w') as fp:
+            json.dump(lib_data, fp)
+    else:
+        print("The path library is currently empty!")
+        print("Please add paths to the library")
+        start()
 
 
 # using JSON file as path library
@@ -156,6 +180,8 @@ def usepathlibrary():
         print("Cannot not locate JSON file, please try again")
         usepathlibrary()
 
+
+# allows user to load by JSON or SQLite
 def selectpathlibrary():
     prompt = input("Do you already have a path library: Y/n ")
     if checkoption(prompt):
@@ -165,8 +191,7 @@ def selectpathlibrary():
         else:
             print("Looking for JSON file...")
             json_dict = usepathlibrary()
-            print(json_dict)
-            library.update(json_dict)
+            pathlibrary.update(json_dict)
     else:
         prompt = input("Would you like to create a new path library: Y/n ")
         if checkoption(prompt):
@@ -175,6 +200,18 @@ def selectpathlibrary():
             print("Goodbye...")
             quit()
 
+
+# loads all dictionaries, adds contents to a list, and then adds that list to the main list
+def openallpaths(pathlib):
+    mainlist = []
+    for key, path, in pathlib.items():
+        thislist = []
+        print("Opening: " + key)
+        dict_contents = open(path, 'r')
+        for word in dict_contents:
+            thislist.append(word.rstrip())
+        mainlist.append(thislist)
+        dict_contents.close()
 
 # start of application
 def start():
