@@ -100,7 +100,7 @@ ENV/
 # refactoring
 main/combinations.py
 main/long.py
-main/scramble.py
+main/select.py
 main/short.py
 main/__init__.py
 code/
