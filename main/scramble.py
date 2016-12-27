@@ -8,7 +8,7 @@ path_library = dict()  # our path library
 
 
 # returns boolean from user input
-def check_option(option):
+def to_boolean(option):
     if option.startswith("Y") or option.startswith("y"):
         return True
     else:
@@ -21,17 +21,17 @@ def locate_files(path):
     return found
 
 
-# calls start() after successfully adding a path to path library
-def start_over(method):
+# calls create() after successfully adding a path to path library
+def add_more_dictionaries():
     prompt = input("Would you like to add more paths to library: Y/n ")
-    if check_option(prompt):
-        method()
+    if to_boolean(prompt) is True:
+        create()
     else:
-        print("continuing...")
-        scanned = load_all_paths(path_library)
+        print("phase 2, line 30")
+        scanned = use_all_dictionaries(path_library)
 
 
-# prompt
+# prompts user to enter path
 def enter_path():
     path = input("Enter path: ")
     return path
@@ -40,7 +40,7 @@ def enter_path():
 # displays the contents of the path library
 def show_path_lib(lib):
     for k, v in lib.items():
-        print("Key: ["+ k +"] " + "Path: [" + v + "]")
+        print("Key: [" + k + "] " + "Path: [" + v + "]")
 
 
 # gets user input and returns the correct path value
@@ -60,21 +60,21 @@ def authenticate(message, method):
 
 
 # adds dictionary path to the path library
-def add_path(list):
-    for val in list:
+def add_path(dictionary):
+    for val in dictionary:
         check = False
         while not check:
             print("For this path: " + val)
             key = input("Please enter a unique key to identify it: ")
             print("Key:", key, ", Path:", val)
             prompt = input("Is this information correct: Y/n ")
-            if check_option(prompt):
+            if to_boolean(prompt):
                 path_library.update({key: val})
                 check = True
             else:
                 check = False
     print("Added!")
-    start_over()
+    add_more_dictionaries()
 
 
 # adds path to a single dictionary to path library
@@ -88,12 +88,12 @@ def single_path():
 def directory_path():
     value = authenticate("directory", directory_path)
     if value.endswith("/"):
-        newpath = value + "*"
-        found = locate_files(newpath)
+        new_path = value + "*"
+        found = locate_files(new_path)
         add_path(found)
     else:
-        newpath = value + "/*"
-        found = locate_files(newpath)
+        new_path = value + "/*"
+        found = locate_files(new_path)
         add_path(found)
 
 
@@ -101,108 +101,127 @@ def directory_path():
 def extension_path():
     value = authenticate("extension", extension_path)
     extension = input("Enter file extension to use: ")
-    newpath = value + "/*" + extension
-    found = locate_files(newpath)
+    new_path = value + "/*" + extension
+    found = locate_files(new_path)
     add_path(found)
-
-
-# single dictionary option
-def single():
-    option = input("Add a single dictionary to new path library: Y/n ")
-    if check_option(option):
-        single_path()
-
-
-# multiple dictionaries option
-def multiple():
-    option = input("Add entire directory of dictionaries to new path library: Y/n ")
-    if check_option(option):
-        directory_path()
-
-    option = input("Add dictionaries by extension to new path library: Y/n ")
-    if check_option(option):
-        extension_path()
-
-    if path_library:
-        print("Current path library size: " + str(len(path_library)))
-        prompt = input("Would you like to see the value(s) in the path library? Y/n ")
-        if check_option(prompt):
-            show_path_lib(path_library)
-        prompt = input("Would you like to store the path library as JSON file: Y/n ")
-        if check_option(prompt):
-            create_json(path_library)
-        else:
-            prompt = input("Your current path library will NOT be saved, is that okay: Y/n ")
-            if check_option(prompt):
-                load_all_paths(path_library)
-            else:
-                create_json(path_library)
-    else:
-        print("Current path library: empty!")
-
-    print("Goodbye...")
-    quit()
 
 
 # creates JSON file from path library data
 def create_json(lib_data):
-    if lib_data:
-        title = input("Enter title for the new JSON file: ")
-        with open(title+'.json', 'w') as fp:
-            json.dump(lib_data, fp)
-    else:
-        print("The path library is currently empty!")
-        print("Please add paths to the library")
-        start()
+    title = input("Enter title for the new JSON file: ")
+    with open(title + '.json', 'w') as fp:
+        json.dump(lib_data, fp)
 
 
-# using JSON file as path library
-def json_path():
-    jsonfile = Path(enter_path())
-    if jsonfile.is_file():
-        location = str(jsonfile.resolve())
+# prompts to display "path_library" variable
+def display_current_library():
+    print("Current path library size: " + str(len(path_library)))  # shows how many dictionaries are in the path library
+    show_path_lib(path_library)  # displays keys and paths
+
+
+# finds JSON dictionary contents and converts it for python use
+def json_dict_to_python():
+    json_file = Path(enter_path())  # prompts user to enter path
+    if json_file.is_file():
+        file_location = str(json_file.resolve())
         try:
-            mypathlib = json.load(open(location))
-            print("Success! Using: " + str(jsonfile))
-            return mypathlib
+            json_dictionary = open(file_location)
+            python_dictionary = json.load(json_dictionary)
+            print("Success! Using: " + str(json_file))
+            json_dictionary.close()
+            return python_dictionary
         except ValueError:
             print("This is not a JSON file, please try again")
-            json_path()
+            json_dict_to_python()
     else:
         print("Cannot not locate JSON file, please try again")
-        json_path()
+        json_dict_to_python()
 
 
-# allows user to load by JSON or SQLite
+# allows user to use a SQLite Database
+def load_database():
+    print("make connection...")  # Coming soon SQLite connection ...
+
+
+# allows user to use a JSON file
 def load_json_file():
-    prompt = input("Do you already have a path library: Y/n ")
-    if check_option(prompt):
-        prompt = input("Are you using a SQLite Database: Y/n ")
-        if check_option(prompt):
-            print("make connection...")  # Coming soon SQLite connection ...
-        else:
-            print("Looking for JSON file...")
-            json_dict = json_path()
-            path_library.update(json_dict)
+    python_dict = json_dict_to_python()
+    path_library.update(python_dict)  # adds contents to global dictionary
+
+
+# questions if the user wants to use an existing path library
+def load():
+    prompt = input("Are you using a SQLite Database: Y/n ")
+    if to_boolean(prompt) is True:
+        load_database()  # access database
     else:
-        prompt = input("Would you like to create a new path library: Y/n ")
-        if check_option(prompt):
-            start()
-        else:
-            print("Goodbye...")
-            quit()
+        print("Looking for JSON file...")
+        load_json_file()  # access json file
+
+
+# creates a new JSON file based on user input
+def create():
+    option = input("Add a single dictionary to new path library: Y/n ")  # using a single dictionary
+    if to_boolean(option) is True:
+        single_path()
+
+    option = input("Add entire directory of dictionaries to new path library: Y/n ")  # using entire directory
+    if to_boolean(option) is True:
+        directory_path()
+
+    option = input("Add dictionaries by extension to new path library: Y/n ")  # using dictionaries by extension
+    if to_boolean(option) is True:
+        extension_path()
+
+
+# beginning of the application
+def start():
+    prompt = input("Do you already have a path library: Y/n ")  # prompts to load existing path library
+    if to_boolean(prompt) is True:
+        load()
+
+    prompt = input("Would you like to create a new path library: Y/n ")  # prompts to create a new JSON file
+    if to_boolean(prompt) is True:
+        create()
+
+    if path_library:
+        prompt = input("Would you like to see the value(s) in the path library? Y/n ")  # prompts to show value and size
+        if to_boolean(prompt) is True:
+            display_current_library()
+
+        prompt = input("Would you like to store this path library as new JSON file: Y/n ")  # store new JSON file
+        if to_boolean(prompt) is True:
+                create_json(path_library)  # creates new JSON file
+        else:  # no save
+            prompt = input("Your current path library will NOT be saved, is that okay: Y/n ")
+            if to_boolean(prompt):
+                use_all_dictionaries(path_library)
+            else:
+                create_json(path_library)
+    else:  # empty
+        print("The current library is empty!")
+        print("Please add/load dictionaries!")
+
+    prompt = input("Would you like to quit: Y/n ")
+    if to_boolean(prompt) is True:
+        print("Goodbye...")
+        quit()
+    else:
+        start()
+
+start()
 
 
 # takes words from dictionary and adds them to the list
 def populate_list(dictionary):
-    list = []
+    store = []
     for word in dictionary:
-        list.append(word.rstrip())
-    return list
+        store.append(word.rstrip())
+    return store
 
 
 # loads all dictionaries, adds contents to a list, and then adds that list to the main list
-def load_all_paths(pathlib):
+def use_all_dictionaries(pathlib):
     mainlist = []
     for key, path, in pathlib.items():
         thislist = []
@@ -216,7 +235,7 @@ def load_all_paths(pathlib):
 
 
 # loads specific dictionaries by a key
-def load_path_by_key(chosen, pathlib):
+def use_dictionary_by_key(chosen, pathlib):
     mainlist = []
     for key, path in pathlib.items():
         if chosen == key:
@@ -228,20 +247,10 @@ def load_path_by_key(chosen, pathlib):
 
 
 # randomly selects and scrambles word
-def scramble(list):
-    selected = random.choice(list)
+def scramble(word_list):
+    selected = random.choice(word_list)
     charlist = list(selected)
     random.shuffle(charlist)
     scrambled = ''.join(charlist)
     retVal = list(scrambled)
     return retVal
-
-
-# start of application
-def start():
-    single()
-    multiple()
-
-
-load_json_file()
-start()
