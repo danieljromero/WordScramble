@@ -198,7 +198,7 @@ def start():
         else:  # no save
             prompt = input("Your current path library will NOT be saved, is that okay: Y/n ")
             if to_boolean(prompt) is True:
-                use_all_dictionaries(path_library, word_bank)
+                implementation()
             else:
                 create_json(path_library)
     else:  # empty
@@ -212,15 +212,13 @@ def start():
     else:
         start()
 
-start()
+#start()
 
 
 # takes words from dictionary and adds them to the list
-def populate_list(dictionary):
-    store = []
+def populate_list(dictionary, word_list):
     for word in dictionary:
-        store.append(word.rstrip())
-    return store
+        word_list.append(word.rstrip())
 
 
 # loads all words from all dictionaries and add them to the list "word_bank"
@@ -228,9 +226,8 @@ def use_all_dictionaries(library, word_list):
     for key, path, in library.items():
         print("Opening: " + key)
         dict_contents = open(path, 'r')
-        store = populate_list(dict_contents)
+        populate_list(dict_contents, word_list)
         dict_contents.close()
-        word_list.append(store)
         key_chain.append(key)
 
 
@@ -264,26 +261,32 @@ def display_keys(library, key_list):
         print("Used Keys: none")
 
 
-# randomly selects a word and scrambles selected word
-def scramble(word_list):
+# randomly selects a word
+def random_select(word_list):
     selected = random.choice(word_list)
+    return selected
+
+
+# scrambles selected word
+def scramble(selected):
     charlist = list(selected)
     random.shuffle(charlist)
     scrambled = ''.join(charlist)
-    retval = list(scrambled)
-    return retval
+    return scrambled
 
 
 # checks if word length is valid
 def valid_length(word_list):
+    print(len(word_list))
     smallest = min(len(word) for word in word_list)
     longest = max(len(word) for word in word_list)
-    print("Smallest: " + smallest + ", Longest: " + longest)
+    print("Smallest Word: " + str(smallest) + ", Longest Word: " + str(longest))
     try:
         num = int(input("Please enter a number: "))
         if smallest <= num <= longest:
             return num
         else:
+            print("Not a valid number")
             valid_length(word_list)
     except ValueError:
         print("Not a valid number")
@@ -299,17 +302,27 @@ def word_by_length(length, word_list):
     return possible
 
 
+# returns true if repeating letter(s) are found
+def is_repeating(word):
+    manipulated = ''.join(set(word))  # turns string to set then returns it back to string
+    if len(word) == len(manipulated):
+        print("non-repeating")
+        return False  # not repeating
+    else:
+        print("repeating")
+        return True  # repeating
+
+
 # finds all possible words
-def find_possible_words(character_list, word_list, possible):
-    for letter in character_list:
-        for word in word_list:
-            if word.startswith(letter):
-                possible.append(word)
-    for possible_word in possible:
-        p_char_list = list(possible_word)
-        for p_letter in p_char_list:
-            if p_letter not in character_list:
-                possible.remove(possible_word)
+def find_possible_words(selected_word, word_list, possible, max_length):
+    for word in word_list:  # selects words by length
+        if len(word) <= max_length:
+            possible.append(word)
+    if is_repeating(selected_word) is False:  # no repeating letters
+        unique_chars = [p for p in possible if not set(p) - set(selected_word)]
+        print(unique_chars)
+    else:  # repeating letters found
+        print("temp")
 
 
 # hides word by putting an underscore for each letter
@@ -327,31 +340,37 @@ def hide_words(approved_list):
 # uses the word bank
 def use_word_bank():
     chosen_length = valid_length(word_bank)
-    starting_words = word_by_length(chosen_length, word_bank)
-    chosen_word = scramble(starting_words)
+    starting_words = word_by_length(chosen_length, word_bank)  # creates a list of all possible words on length
+    chosen_word = random_select(starting_words)
+    print(chosen_word)
     initial_word.append(chosen_word)
     print(initial_word)
-    find_possible_words(chosen_word, word_bank, possible_words)
-    hide_words(possible_words)
+    find_possible_words(chosen_word, word_bank, possible_words, chosen_length)
+    #hide_words(possible_words)
 
 
 def implementation():
     prompt = input("Would you like to use all the dictionaries in the library: Y/n ")
     if to_boolean(prompt) is True:
         use_all_dictionaries(path_library, word_bank)  # adds words to "word_bank" list
-
-    prompt = input("Would you like to select dictionaries to use by key: Y/n ")
-    if to_boolean(prompt) is True:
-        another_one = True
-        while another_one is True:
-            display_keys(path_library, key_chain)
-            use_dictionary_by_key(path_library, word_bank, key_chain)  # adds words to "word_bank" list
-            prompt = input("Would you like to use another key: Y/n ")
-            if to_boolean(prompt) is False:
-                another_one = False
+    else:
+        prompt = input("Would you like to select dictionaries to use by key: Y/n ")
+        if to_boolean(prompt) is True:
+            another_one = True
+            while another_one is True:
+                display_keys(path_library, key_chain)
+                use_dictionary_by_key(path_library, word_bank, key_chain)  # adds words to "word_bank" list
+                prompt = input("Would you like to use another key: Y/n ")
+                if to_boolean(prompt) is False:
+                    another_one = False
+        else:
+            print("Please select an option!")
+            implementation()
 
     prompt = input("Would you like to start: Y/n ")
     if to_boolean(prompt) is True:
         use_word_bank()
 
 
+start()
+implementation()
