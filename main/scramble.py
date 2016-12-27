@@ -5,6 +5,10 @@ import random
 from pathlib import Path
 
 path_library = dict()  # our path library
+word_bank = []  # list of words
+key_chain = []  # list of keys
+possible_words = []  # list of possible words
+initial_word = []  # word that we are using
 
 
 # returns boolean from user input
@@ -28,7 +32,6 @@ def add_more_dictionaries():
         create()
     else:
         print("phase 2, line 30")
-        scanned = use_all_dictionaries(path_library)
 
 
 # prompts user to enter path
@@ -68,7 +71,7 @@ def add_path(dictionary):
             key = input("Please enter a unique key to identify it: ")
             print("Key:", key, ", Path:", val)
             prompt = input("Is this information correct: Y/n ")
-            if to_boolean(prompt):
+            if to_boolean(prompt) is True:
                 path_library.update({key: val})
                 check = True
             else:
@@ -194,8 +197,8 @@ def start():
                 create_json(path_library)  # creates new JSON file
         else:  # no save
             prompt = input("Your current path library will NOT be saved, is that okay: Y/n ")
-            if to_boolean(prompt):
-                use_all_dictionaries(path_library)
+            if to_boolean(prompt) is True:
+                use_all_dictionaries(path_library, word_bank)
             else:
                 create_json(path_library)
     else:  # empty
@@ -220,37 +223,135 @@ def populate_list(dictionary):
     return store
 
 
-# loads all dictionaries, adds contents to a list, and then adds that list to the main list
-def use_all_dictionaries(pathlib):
-    mainlist = []
-    for key, path, in pathlib.items():
-        thislist = []
+# loads all words from all dictionaries and add them to the list "word_bank"
+def use_all_dictionaries(library, word_list):
+    for key, path, in library.items():
         print("Opening: " + key)
         dict_contents = open(path, 'r')
-        for word in dict_contents:
-            thislist.append(word.rstrip())
-        mainlist.append(thislist)
+        store = populate_list(dict_contents)
         dict_contents.close()
-    return mainlist
+        word_list.append(store)
+        key_chain.append(key)
 
 
 # loads specific dictionaries by a key
-def use_dictionary_by_key(chosen, pathlib):
-    mainlist = []
-    for key, path in pathlib.items():
-        if chosen == key:
-            dict_contents = open(path, 'r')
-            store = populate_list(dict_contents)
-            dict_contents.close()
-        mainlist.append(store)
-    return mainlist
+def use_dictionary_by_key(library, word_list, key_list):
+    chosen = input("Please enter a key: ")
+    if chosen not in key_list:
+        if chosen in library:
+            key_list.append(chosen)
+            for key, path in library.items():
+                if chosen == key:
+                    dict_contents = open(path, 'r')
+                    store = populate_list(dict_contents)
+                    dict_contents.close()
+                    word_list.append(store)
+        else:
+            print("Could not find key, please try again")
+            use_dictionary_by_key(library, word_list, key_list)
+    else:
+        print("You have already used this key!")
 
 
-# randomly selects and scrambles word
+# displays all of the available keys in the library
+def display_keys(library, key_list):
+    for key in library.items():
+        print("Library Key: " + key)
+    if key_list:
+        for key in key_list:
+            print("Used Key: " + key)
+    else:
+        print("Used Keys: none")
+
+
+# randomly selects a word and scrambles selected word
 def scramble(word_list):
     selected = random.choice(word_list)
     charlist = list(selected)
     random.shuffle(charlist)
     scrambled = ''.join(charlist)
-    retVal = list(scrambled)
-    return retVal
+    retval = list(scrambled)
+    return retval
+
+
+# checks if word length is valid
+def valid_length(word_list):
+    smallest = min(len(word) for word in word_list)
+    longest = max(len(word) for word in word_list)
+    print("Smallest: " + smallest + ", Longest: " + longest)
+    try:
+        num = int(input("Please enter a number: "))
+        if smallest <= num <= longest:
+            return num
+        else:
+            valid_length(word_list)
+    except ValueError:
+        print("Not a valid number")
+        valid_length(word_list)
+
+
+# returns a list of possible words based on length
+def word_by_length(length, word_list):
+    possible = []
+    for word in word_list:
+        if len(word) == length:
+            possible.append(word)
+    return possible
+
+
+# finds all possible words
+def find_possible_words(character_list, word_list, possible):
+    for letter in character_list:
+        for word in word_list:
+            if word.startswith(letter):
+                possible.append(word)
+    for possible_word in possible:
+        p_char_list = list(possible_word)
+        for p_letter in p_char_list:
+            if p_letter not in character_list:
+                possible.remove(possible_word)
+
+
+# hides word by putting an underscore for each letter
+def hide_words(approved_list):
+    sorted(approved_list)
+    dashes = []
+    for word in approved_list:
+        temp = ""
+        for letter in word:
+            temp.join("_")
+        dashes.append(temp)
+    print(dashes)
+
+
+# uses the word bank
+def use_word_bank():
+    chosen_length = valid_length(word_bank)
+    starting_words = word_by_length(chosen_length, word_bank)
+    chosen_word = scramble(starting_words)
+    initial_word.append(chosen_word)
+    print(initial_word)
+    find_possible_words(chosen_word, word_bank, possible_words)
+    hide_words(possible_words)
+
+
+def implementation():
+    prompt = input("Would you like to use all the dictionaries in the library: Y/n ")
+    if to_boolean(prompt) is True:
+        use_all_dictionaries(path_library, word_bank)  # adds words to "word_bank" list
+
+    prompt = input("Would you like to select dictionaries to use by key: Y/n ")
+    if to_boolean(prompt) is True:
+        another_one = True
+        while another_one is True:
+            display_keys(path_library, key_chain)
+            use_dictionary_by_key(path_library, word_bank, key_chain)  # adds words to "word_bank" list
+            prompt = input("Would you like to use another key: Y/n ")
+            if to_boolean(prompt) is False:
+                another_one = False
+
+    prompt = input("Would you like to start: Y/n ")
+    if to_boolean(prompt) is True:
+        use_word_bank()
+
+
