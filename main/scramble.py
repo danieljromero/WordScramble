@@ -2,12 +2,12 @@
 import glob
 import json
 import random
+from collections import OrderedDict
 from pathlib import Path
 
 path_library = dict()  # our path library
 word_bank = []  # list of words
 key_chain = []  # list of keys
-initial_word = []  # word that we are using
 
 
 # returns boolean from user input
@@ -266,7 +266,7 @@ def random_select(word_list):
     return selected
 
 
-# scrambles selected word
+# returns a scrambled word
 def scramble(selected):
     char_list = list(selected)
     random.shuffle(char_list)
@@ -293,7 +293,7 @@ def valid_length(word_list):
 
 
 # returns a list of possible words based on length
-def word_by_length(length, word_list):
+def words_by_length(length, word_list):
     possible = []
     for word in word_list:
         if len(word) == length:
@@ -335,29 +335,65 @@ def find_possible_words(selected_word, word_list, max_length):
     return possible_words
 
 
-# hides word by putting an underscore for each letter
-def hide_words(approved_list):
-    sorted(approved_list)
-    dashes = []
-    for word in approved_list:
-        temp = ""
-        for letter in word:
-            temp.join("_")
-        dashes.append(temp)
-    print(dashes)
+# generates an underscore for each character in the word
+def underscore_representation(word):
+    underscore = "_" * len(word)
+    return underscore
+
+
+# returns a dictionary with keys and value representation of words with underscore
+def hide_words(word_set):
+    sort_alphabetically = sorted(word_set)
+    sort_by_length = sorted(sort_alphabetically, key=len)
+    dashes = [underscore_representation(word) for word in sort_by_length]  # generates list of underscore's
+    answers = OrderedDict(zip(sort_by_length, dashes))  # preserves ordering for display
+    return answers
+
+
+# displays underscores
+def game(answers, word):
+    gameover = len(answers)
+    correct = []
+    incorrect = []
+    print("Press \"q\" to quit, \"v\" to view incorrect guesses")
+    while len(correct) < gameover:
+        for value in answers:
+            print(answers.get(value))
+        print("\n===========")
+        print("Unscramble: \""+word+"\"")
+        print("===========")
+        guess = input("Guess Word: ")
+        while not guess:
+            guess = input("Guess Word: ")
+        if guess in answers and guess not in correct:
+            print("===========")
+            correct.append(guess)
+            answers[guess] = guess
+        elif guess == "v":
+            print("Previous Guesses: ", incorrect)
+        elif guess == "q":
+            for key in answers:
+                print(key)
+            print("===========")
+            print("Gameover")
+            print("===========")
+            break
+        else:
+            incorrect.append(guess)
+    print("Correct Guesses: " + str(len(correct)) + "/" + str(gameover))
+    if len(correct) == gameover:
+        print("Congratulations! You win!")
 
 
 # uses the word bank
 def use_word_bank():
-    chosen_length = valid_length(word_bank)
-    starting_words = word_by_length(chosen_length, word_bank)  # creates a list of all possible words on length
+    chosen_length = valid_length(word_bank)  # prompts user to enter a length, difficulty increases as size increases
+    starting_words = words_by_length(chosen_length, word_bank)  # creates a list of all possible words on length
     chosen_word = random_select(starting_words)
-    print(chosen_word)
-    analyze(chosen_word)
-    initial_word.append(chosen_word)
-    print(initial_word)
-    find_possible_words(chosen_word, word_bank, chosen_length)
-    #hide_words(possible_words)
+    scrambled = scramble(chosen_word)
+    possible_words = find_possible_words(chosen_word, word_bank, chosen_length)
+    answers = hide_words(possible_words)
+    game(answers, scrambled)
 
 
 def implementation():
