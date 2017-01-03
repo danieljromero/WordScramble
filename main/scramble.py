@@ -269,9 +269,9 @@ def random_select(word_list):
 
 # scrambles selected word
 def scramble(selected):
-    charlist = list(selected)
-    random.shuffle(charlist)
-    scrambled = ''.join(charlist)
+    char_list = list(selected)
+    random.shuffle(char_list)
+    scrambled = ''.join(char_list)
     return scrambled
 
 
@@ -302,27 +302,24 @@ def word_by_length(length, word_list):
     return possible
 
 
-# returns true if repeating letter(s) are found
-def is_repeating(word):
-    manipulated = ''.join(set(word))  # turns string to set then returns it back to string
-    if len(word) == len(manipulated):
-        print("non-repeating")
-        return False  # not repeating
-    else:
-        print("repeating")
-        return True  # repeating
+# returns dictionary representing letters and amount of occurrences in a word
+def analyze(word):
+    word_list = list(enumerate(word))
+    results = dict()
+    for index, letter in word_list:
+        count = 1
+        for i, character in word_list:
+            if i != index and letter == character:
+                count += 1
+        if letter not in results:
+            results.update({letter: count})
+    return results
 
 
 # finds all possible words
-def find_possible_words(selected_word, word_list, possible, max_length):
-    for word in word_list:  # selects words by length
-        if len(word) <= max_length:
-            possible.append(word)
-    if is_repeating(selected_word) is False:  # no repeating letters
-        unique_chars = [p for p in possible if not set(p) - set(selected_word)]
-        print(unique_chars)
-    else:  # repeating letters found
-        print("temp")
+def find_possible_words(selected_word, word_list, max_length):
+    word_stats = analyze(selected_word)
+    pw = [word for word in word_list if len(word) <= max_length and not set(word) - set(selected_word)]
 
 
 # hides word by putting an underscore for each letter
@@ -343,9 +340,10 @@ def use_word_bank():
     starting_words = word_by_length(chosen_length, word_bank)  # creates a list of all possible words on length
     chosen_word = random_select(starting_words)
     print(chosen_word)
+    analyze(chosen_word)
     initial_word.append(chosen_word)
     print(initial_word)
-    find_possible_words(chosen_word, word_bank, possible_words, chosen_length)
+    find_possible_words(chosen_word, word_bank, chosen_length)
     #hide_words(possible_words)
 
 
