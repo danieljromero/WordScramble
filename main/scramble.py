@@ -7,7 +7,6 @@ from pathlib import Path
 path_library = dict()  # our path library
 word_bank = []  # list of words
 key_chain = []  # list of keys
-possible_words = []  # list of possible words
 initial_word = []  # word that we are using
 
 
@@ -316,10 +315,24 @@ def analyze(word):
     return results
 
 
-# finds all possible words
+# returns true if word contains correct number of characters based on word stats
+def valid_occurrences(word, dict_stats):
+    new_dict_stats = analyze(word)
+    for key in new_dict_stats:
+        main_value = dict_stats.get(key)
+        new_value = new_dict_stats.get(key)
+        if new_value > main_value:
+            return False
+    return True
+
+
+# returns set of all possible words
 def find_possible_words(selected_word, word_list, max_length):
     word_stats = analyze(selected_word)
     pw = [word for word in word_list if len(word) <= max_length and not set(word) - set(selected_word)]
+    possible_words = set([word for word in pw if valid_occurrences(word, word_stats) is True])
+    print(possible_words)
+    return possible_words
 
 
 # hides word by putting an underscore for each letter
