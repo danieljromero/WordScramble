@@ -91,19 +91,16 @@ ENV/
 # intellij
 .idea
 .idea/
+.idea/inspectionProfiles
 .idea/misc.xml
 .idea/modules.xml
 .idea/vcs.xml
 .idea/workspace.xml
-.idea/scramble-py.iml
+.idea/WordScramble.iml
 
-# refactoring
-main/combinations.py
-main/long.py
-main/select.py
-main/short.py
-main/__init__.py
-code/
+# resources
+__init__.py
+scramble.py
 
 # tests
 tests/

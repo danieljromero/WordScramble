@@ -1,4 +1,3 @@
-# File: library.py
 import glob
 import json
 import random
