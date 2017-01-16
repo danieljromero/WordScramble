@@ -1,3 +1,7 @@
+# File: option.py
+# Common functions used in other python files
+
+
 def interpret(user_input):
     """
     Takes user input and returns a boolean, defaults to false
@@ -49,7 +53,7 @@ def existing_path_lib():
     Asks user if path library already exists
     :return: True or False based on users input
     """
-    answer = input("Do you already have a path library: " + yes_or_no())
+    answer = input("Do you already have a path library JSON file: " + yes_or_no())
     return interpret(answer)
 
 
@@ -76,5 +80,5 @@ def quit_game_prompt():
     Asks user if they want to quit
     :return: True or False based on users input
     """
-    answer = input("Would you like to quit:" + yes_or_no())
+    answer = input("Would you like to quit: " + yes_or_no())
     return interpret(answer)
