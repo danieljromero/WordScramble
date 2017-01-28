@@ -102,5 +102,5 @@ ENV/
 .pyc
 
 #old files
-wordscramble
-json
+wordscramble/
+json/
