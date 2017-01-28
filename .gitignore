@@ -98,14 +98,9 @@ ENV/
 .idea/workspace.xml
 .idea/WordScramble.iml
 
-# resources
-scramble.py
-
-# tests
-tests/
-tests
-
 #pyc
 .pyc
-bin/
-modules/__init__.py
+
+#old files
+wordscramble
+json
