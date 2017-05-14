@@ -31,7 +31,7 @@ $ workon somevirtualenv
 ```
 Clone repository
 ```
-$ git clone https://github.com/dromsoft/WordScramble.git
+$ git clone https://github.com/romerodan/WordScramble.git
 ```
 Navigate inside directory
 ```
