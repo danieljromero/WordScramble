@@ -98,8 +98,10 @@ ENV/
 .idea/workspace.xml
 .idea/WordScramble.iml
 
-#pyc
-.pyc
+# Cython Extensions and C Files
+*.pyx
+*.pyc
+*.c
 
 #old files
 wordscramble/
