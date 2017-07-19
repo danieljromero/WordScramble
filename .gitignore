@@ -106,3 +106,7 @@ ENV/
 #old files
 wordscramble/
 json/
+
+# Executables
+bin/
+cmake-build-debug/
