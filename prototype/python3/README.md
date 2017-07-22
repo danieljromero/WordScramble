@@ -1,6 +1,6 @@
 # WordScramble v0.1
 
- A command line word game using Python3
+ A CLI Prototype written in Python3
 
 ### Getting Started
 
@@ -31,11 +31,11 @@ $ workon somevirtualenv
 ```
 Clone repository
 ```
-$ git clone https://github.com/romerodan/WordScramble.git
+$ git clone https://github.com/danieljromero/WordScramble.git
 ```
 Navigate inside directory
 ```
-$ cd WordScramble
+$ cd WordScramble/prototype/python3/
 ```
 Use pip
 ```
