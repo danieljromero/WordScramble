@@ -84,7 +84,3 @@ $ rm -rf ~/path/to/WordScramble/
 ## Contributing
 
 _Under Construction_
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
