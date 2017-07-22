@@ -36,5 +36,4 @@
 # Project files
 .idea/
 bin/
-lib/
 cmake-build-debug/
