@@ -1,11 +1,24 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
+# Created by .ignore support plugin (hsz.mobi)
+### C++ template
+# Prerequisites
+*.d
 
-# C extensions
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
 *.so
+*.dylib
+*.dll
 
+<<<<<<< HEAD:prototype/python3/.gitignore
 # Distribution / packaging
 .Python
 env/
@@ -64,3 +77,24 @@ ENV/
 
 # Cython Files
 .pyc
+=======
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Project files
+.idea/
+bin/
+cmake-build-debug/
+>>>>>>> feature/cpp:.gitignore
