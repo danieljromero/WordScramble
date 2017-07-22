@@ -1,10 +1,10 @@
 # WordScramble v0.1
 
- A CLI Prototype written in Python3
+ A CLI App Prototype written in Python3
 
 ### Getting Started
 
-It is highly recommended to use a Python3 Virtual Environment (virtualenv) for managing dependencies, creating isolated python project environments and, most importantly, not breaking your system wide Python installation. Anyways, let's begin!
+It is highly recommended to use a Python3 Virtual Environment (virtualenv) for managing dependencies, creating isolated python project environments, etc.
 
 ### Prerequisites
 
@@ -12,9 +12,9 @@ Check Python3 version, requires **Python 3.4+**
 ```
 $ python3 --version
 ```
-Check if **pip** is installed
+Check if **pip3** is installed
 ```
-$ pip --version
+$ pip3 --version
 ```
 
 ### Requirements
@@ -45,11 +45,9 @@ Check if installed correctly, you should see **WordScramble** listed
 ```
 $ pip list
 ```
-At this point you are ready to play the game!
+## Launch prototype
 
-## Playing the game
-
-To see parameters needed for the game
+To see help:
 ```
 $ wordscramble --help
 ```
@@ -61,13 +59,12 @@ $ wordscramble --help
 
 Move to **WordScramble** directory
 ```
-$ cd ~/path/to/WordScramble/
+$ cd ~/path/to/WordScramble/prototype/python3/
 ```
 Then do
 ```
 $ wordscramble dictionaries/large.txt 4
 ```
-Enjoy!
 
 ## Uninstalling
 
