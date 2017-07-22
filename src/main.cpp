@@ -1,4 +1,3 @@
-
 #include "../include/WordScramble/WordFilter.hpp"
 
 int main() {

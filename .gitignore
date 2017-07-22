@@ -38,4 +38,3 @@
 bin/
 lib/
 cmake-build-debug/
-test/
